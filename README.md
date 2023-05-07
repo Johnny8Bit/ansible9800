@@ -19,6 +19,14 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 ├── wlc_hosts
 └── wlc_init_template.txt
 ```
+### Ansible Configuration
+
+Changes to ansible.cfg:
+
+inventory = /etc/ansible/wlc_hosts
+gathering = explicit
+host_key_checking = False
+record_host_keys=False
 
 ### WLC Config
 Simple but complete WLC configuration, including:
