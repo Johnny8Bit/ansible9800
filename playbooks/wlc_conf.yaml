@@ -9,7 +9,7 @@
     - name: VLANs
       cisco.ios.ios_config:
         defaults: true
-        parents: vlan 3
+        parents: vlan {{ ssid_vlan }}
         lines:
           - name TestNet
 
@@ -19,9 +19,9 @@
         parents: ap profile MyAPProfile
         lines:
           - no apphost
-          - country PL
+          - country {{ wireless_country_code }}
           - description "AP Profile - Ansible"
-          - mgmtuser username admin password 0 C15coecats secret 0 C15coecats
+          - mgmtuser username {{ ap_profile_mgmt_user }} password 0 {{ ap_profile_mgmt_pass }} secret 0 {{ ap_profile_mgmt_secret }}
           - rogue detection min-rssi -70
           - no telnet
           - ssh
@@ -109,7 +109,7 @@
           - dot11ax twt-broadcast-support
           - radio policy dot11 5ghz
           - no security ft adaptive
-          - security wpa psk set-key ascii 0 TestNet!
+          - security wpa psk set-key ascii 0 {{ ssid_psk }}
           - no security wpa akm dot1x
           - security wpa akm psk
           - security wpa akm sae
@@ -188,10 +188,19 @@
           - logging synchronous
           - transport input ssh
 
-    - name: Line VTY 5 50
+    - name: Line VTY 5 15
       cisco.ios.ios_config:
         defaults: true
-        parents: line vty 5 50
+        parents: line vty 5 15
+        lines:
+          - exec-timeout 60 0
+          - logging synchronous
+          - transport input ssh
+
+    - name: Line VTY 16 50
+      cisco.ios.ios_config:
+        defaults: true
+        parents: line vty 16 50
         lines:
           - exec-timeout 60 0
           - logging synchronous
@@ -208,14 +217,15 @@
       cisco.ios.ios_config:
         defaults: true
         lines:
-          - hostname WLC9800
-          - wireless country PL
+          - hostname {{ inventory_hostname }}
+          - wireless country {{ wireless_country_code }}
           - wireless rf-network rf
+          - wireless management interface Vlan {{ wireless_management_vlan }}
           - ap tri-radio
           - no ap dot11 24ghz SI
           - no ap dot11 5ghz SI
-          - ip name-server 192.168.2.5
-          - ntp server pl.pool.ntp.org
+          - ip name-server {{ dns_server }}
+          - ntp server {{ ntp_server }}
           - ap filter priority 1 filter-name MyFilter
 
     - name: Save Config
