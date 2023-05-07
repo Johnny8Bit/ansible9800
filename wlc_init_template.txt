@@ -1,0 +1,14 @@
+user <username> privilege 15 secret <secret>
+!
+vlan <vlan>
+!
+int <interface>
+ switchport mode trunk
+!
+interface vlan <vlan>
+ ip address <address> <mask>
+!
+ip default-gateway <gateway>
+!
+line vty 0 15
+ login local
