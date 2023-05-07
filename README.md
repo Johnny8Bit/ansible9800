@@ -8,7 +8,7 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 
 ### Ansible hierarchy
 
-Structure of /etc/ansible
+/etc/ansible
 ```
 ├── ansible.cfg
 ├── group_vars
