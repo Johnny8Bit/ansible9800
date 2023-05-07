@@ -1,6 +1,4 @@
-## ansible9800
-
-Ansible project for Cisco Catalyst 9800 wirelesss controller.
+## Ansible project for Cisco Catalyst 9800 wirelesss controller.
 
 Configures WLC from scratch.
 
