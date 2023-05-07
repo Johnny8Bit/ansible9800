@@ -9,7 +9,7 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 ### Ansible hierarchy
 
 Structure of /etc/ansible
-'''
+```
 ├── ansible.cfg
 ├── group_vars
 │   └── wlcs.yaml
@@ -17,7 +17,7 @@ Structure of /etc/ansible
 │   └── wlc_conf.yaml
 ├── wlc_hosts
 └── wlc_init_template.txt
-'''
+```
 
 ### WLC Config
 Simple but complete WLC configuration, including:
