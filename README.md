@@ -21,7 +21,7 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 ```
 ### Ansible Configuration
 
-Changes to ansible.cfg:
+Changes to ansible.cfg
 ```
 inventory = /etc/ansible/wlc_hosts
 gathering = explicit
