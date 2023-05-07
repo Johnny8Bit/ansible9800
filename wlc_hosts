@@ -1,3 +1,6 @@
+# Provide hostname and IP (using ansible_host variable)
+# Hostname is used in the Playbook to set actual hostname of device
+
 [wlcs]
 WLC9800-1 ansible_host=192.168.6.8
 
