@@ -2,6 +2,6 @@
 
 Configures WLC from scratch.
 
-Uses 'cisco.ios.ios_config' module as Ansible does not have WLC-specific resource modules. 
+Uses generic 'cisco.ios.ios_config' module as Ansible does not have WLC-specific resource modules. 
 
 WLC needs initial base config and must be reachable via SSH, e.g.: `wlc_init_template.txt`
