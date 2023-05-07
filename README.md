@@ -8,13 +8,13 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 
 ### Ansible hierarchy
 
-/etc/ansible
-- ansible.cfg
-- wlc_hosts
-- /group_vars
-  - wlcs.yaml
-- /playbooks
-  - wlc_conf.yaml
+- /etc/ansible
+  - ansible.cfg
+  - wlc_hosts
+  - /group_vars
+    - wlcs.yaml
+  - /playbooks
+    - wlc_conf.yaml
 
 
 ### WLC Config
