@@ -7,8 +7,7 @@ Uses generic 'cisco.ios.ios_config' module as Ansible does not have WLC-specific
 WLC needs initial base config and must be reachable via SSH, see example: `wlc_init_template.txt`
 
 ### WLC Config
-Simple but complete WLC configuration
-Configures:
+Simple but complete WLC configuration, including:
 * VLAN
 * AP Join Profile
 * Site Tag
