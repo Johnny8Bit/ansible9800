@@ -1,3 +1,4 @@
+!
 user <username> privilege 15 secret <secret>
 !
 vlan <vlan>
@@ -12,3 +13,4 @@ ip default-gateway <gateway>
 !
 line vty 0 15
  login local
+!
