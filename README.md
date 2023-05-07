@@ -16,8 +16,7 @@ WLC needs initial base config and must be reachable via SSH, see example: `wlc_i
 │   └── wlcs.yaml
 ├── playbooks
 │   └── wlc_conf.yaml
-├── wlc_hosts
-└── wlc_init_template.txt
+└── wlc_hosts
 ```
 ### Ansible Configuration
 
