@@ -1,0 +1,223 @@
+---
+
+- name: Configure WLC
+  hosts: wlcs
+  gather_facts: false
+
+  tasks:
+
+    - name: VLANs
+      cisco.ios.ios_config:
+        defaults: true
+        parents: vlan 3
+        lines:
+          - name TestNet
+
+    - name: AP Profile
+      cisco.ios.ios_config:
+        defaults: true
+        parents: ap profile MyAPProfile
+        lines:
+          - no apphost
+          - country PL
+          - description "AP Profile - Ansible"
+          - mgmtuser username admin password 0 C15coecats secret 0 C15coecats
+          - rogue detection min-rssi -70
+          - no telnet
+          - ssh
+          - syslog host 0.0.0.0
+
+    - name: Site Tag
+      cisco.ios.ios_config:
+        defaults: true
+        parents: wireless tag site MySiteTag
+        lines:
+          - ap-profile MyAPProfile
+          - description "Site Tag - Ansible"
+          - local-site
+
+    - name: RF Profile 24GHz
+      cisco.ios.ios_config:
+        defaults: true
+        parents: ap dot11 24ghz rf-profile MyRFProfile24GHz
+        before:
+          - ap dot11 24ghz rf-profile MyRFProfile24GHz
+          - shutdown
+        lines:
+          - rate RATE_1M disable
+          - rate RATE_2M disable
+          - rate RATE_5_5M disable
+          - rate RATE_6M disable
+          - rate RATE_9M disable
+          - rate RATE_11M disable
+          - rate RATE_12M disable
+          - rate RATE_18M disable
+          - rate RATE_24M mandatory
+          - rate RATE_36M supported
+          - rate RATE_48M supported
+          - rate RATE_54M supported
+          - tx-power min 0
+          - tx-power max 30
+        after:
+          - ap dot11 24ghz rf-profile MyRFProfile24GHz
+          - no shutdown
+
+    - name: RF Profile 5GHz
+      cisco.ios.ios_config:
+        defaults: true
+        diff_ignore_lines:
+          - shutdown
+        parents: ap dot11 5ghz rf-profile MyRFProfile5GHz
+        before:
+          - ap dot11 5ghz rf-profile MyRFProfile5GHz
+          - shutdown
+        lines:
+          - channel chan-width 20
+          - rate RATE_6M disable
+          - rate RATE_9M disable
+          - rate RATE_12M disable
+          - rate RATE_18M disable
+          - rate RATE_24M mandatory
+          - rate RATE_36M supported
+          - rate RATE_48M supported
+          - rate RATE_54M supported
+          - tx-power min 0
+          - tx-power max 30
+        after:
+          - ap dot11 5ghz rf-profile MyRFProfile5GHz
+          - no shutdown
+
+    - name: RF Tag
+      cisco.ios.ios_config:
+        defaults: true
+        parents: wireless tag rf MyRFTag
+        lines:
+          - description "RF Tag - Ansible"
+          - 24ghz-rf-policy MyRFProfile24GHz
+          - 5ghz-rf-policy MyRFProfile5GHz
+
+    - name: SSID - TestNet
+      cisco.ios.ios_config:
+        defaults: true
+        parents: wlan TestNet 10 TestNet
+        before:
+          - wlan TestNet 10 TestNet
+          - shutdown
+        lines:
+          - ccx aironet-iesupport
+          - dot11ax target-waketime
+          - dot11ax twt-broadcast-support
+          - radio policy dot11 5ghz
+          - no security ft adaptive
+          - security wpa psk set-key ascii 0 TestNet!
+          - no security wpa akm dot1x
+          - security wpa akm psk
+          - security wpa akm sae
+          - security wpa wpa3
+          - security pmf optional
+          - wmm require
+        after:
+          - wlan TestNet 10 TestNet
+          - no shutdown
+
+    - name: Policy - TestNet
+      cisco.ios.ios_config:
+        defaults: true
+        parents: wireless profile policy TestNetPolicy
+        before:
+          - wireless profile policy TestNetPolicy
+          - shutdown
+        lines:
+          - description "Policy Profile - Ansible"
+          - dhcp-tlv-caching
+          - no http-tlv-caching
+          - idle-timeout 3600
+          - session-timeout 65535
+          - no ipv4 dhcp required
+          - vlan TestNet
+          - service-policy input platinum-up
+          - service-policy output platinum
+        after:
+          - wireless profile policy TestNetPolicy
+          - no shutdown
+
+    - name: PolicyTag
+      cisco.ios.ios_config:
+        defaults: true
+        parents: wireless tag policy MyPolicyTag
+        lines:
+          - description "Policy Tag - Ansible"
+          - wlan TestNet policy TestNetPolicy
+
+    - name: AP Filter
+      cisco.ios.ios_config:
+        defaults: true
+        parents: ap filter name MyFilter
+        lines:
+          - ap name-regex AP
+          - tag policy MyPolicyTag
+          - tag rf MyRFTag
+          - tag site MySiteTag
+
+    - name: Authentication Convert
+      block:
+        - name: Authentication Convert
+          cisco.ios.ios_config:
+            defaults: false
+            lines:
+              - authentication convert-to new-style forced
+      rescue:
+        - name: Authentication Convert > Failed
+          ansible.builtin.debug:
+            msg: "Authentication is already new-style (probably)"
+
+    - name: Parameter Map
+      cisco.ios.ios_config:
+        defaults: true
+        parents: parameter-map type webauth global
+        lines:
+          - virtual-ip ipv4 192.0.2.1
+          - virtual-ip ipv6 2001:DB::1
+
+    - name: Line VTY 0 4
+      cisco.ios.ios_config:
+        defaults: true
+        parents: line vty 0 4
+        lines:
+          - exec-timeout 60 0
+          - logging synchronous
+          - transport input ssh
+
+    - name: Line VTY 5 50
+      cisco.ios.ios_config:
+        defaults: true
+        parents: line vty 5 50
+        lines:
+          - exec-timeout 60 0
+          - logging synchronous
+          - transport input ssh
+
+    - name: Line CON
+      cisco.ios.ios_config:
+        defaults: true
+        parents: line con 0
+        lines:
+          - logging synchronous
+
+    - name: Global Config
+      cisco.ios.ios_config:
+        defaults: true
+        lines:
+          - hostname WLC9800
+          - wireless country PL
+          - wireless rf-network rf
+          - ap tri-radio
+          - no ap dot11 24ghz SI
+          - no ap dot11 5ghz SI
+          - ip name-server 192.168.2.5
+          - ntp server pl.pool.ntp.org
+          - ap filter priority 1 filter-name MyFilter
+
+    - name: Save Config
+      cisco.ios.ios_config:
+        save_when: modified
